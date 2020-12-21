@@ -41,10 +41,10 @@ router.get('/', (req, res, next) => {
                     if (ERR(err, next)) return;
                     res.locals.log = result.rows;
                     if (res.locals.assessment.group_work) {
-                        const params = {assessment_instance_id: res.locals.assessment_instance.id};
-                        sqlDb.query(sql.select_group_info, params, (err, result) => {
+                        const params = [res.locals.assessment_instance.id];
+                        sqlDb.call('instance_questions_group_contribution', params, (err, result) => {
                             if (ERR(err, next)) return;
-                            res.locals.group = result.rows[0];
+                            res.locals.group_info = result.rows;
                             res.render(__filename.replace(/\.js$/, '.ejs'), res.locals);
                         });
                     } else {
