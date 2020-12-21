@@ -238,6 +238,65 @@
       </div>
 
       <!-- ###################################################################### -->
+       <!-- ###################################################################### -->
+
+      <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+          <%= assessment_instance_label %>
+          Contributions:
+          <% if (assessment.group_work) { %>
+            <%= group.name %> <i class="fas fa-users"></i>
+          <% } else { %>
+            <%= instance_user.name %> (<%= instance_user.uid %>)
+          <% } %>
+        </div>
+        <table id="instanceQuestionStatsTable" class="table table-sm table-hover tablesorter">
+          <thead>
+          <tr>
+            <th>Assignment</th>
+      <th>Assessment Id</th>
+            <th>Question</th>
+            <th>Contributions</th>
+          </tr>
+          </thead>
+          <tbody>
+          <% group_stats.forEach(function(row) { %>
+          <tr>
+            <td><%= row.assessment_label%></td>
+            <td><%= row.assessment_instance_id %></td>
+            <td><%= row.instance_question_id %></td>
+            <td>
+     <div id="histContribution" class="miniHist"></div>
+     </td>
+          </tr>
+    <script>
+                  $(function() {
+                      var data = [<%= row.contribution %>];
+                      const options = {
+                          width: 55,
+                          height: 120,
+                          normalize: true
+                      };
+                    histmini("#histContribution", data, options);
+                  });
+         </script>
+          <% }); %>
+          </tbody>
+        </table>
+
+        <script>
+            $(function(){
+                $("#loginstanceQuestionStatsTable").tablesorter({
+                    theme: "bootstrap",
+                    widthFixed: true,
+                    headerTemplate: '{content} {icon}',
+                    widgets: ["uitheme"],
+                });
+            });
+        </script>
+      </div>
+      <!-- ###################################################################### -->
+
       <!-- ###################################################################### -->
 
       <div class="card mb-4">

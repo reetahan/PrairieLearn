@@ -81,17 +81,34 @@ BEGIN
         ),
         rw_contribution_padded AS (
             (
-                SELECT
-                    gm.user_id as user_id,
-                    gm.ai_id as ai_id,
-                    CASE WHEN rwc.iq_id is NULL THEN 0 ELSE rwc.iq_id END AS iq_id,
-                    CASE WHEN rwc.contribution is NULL THEN 0 ELSE rwc.contribution END AS contribution
+                SELECT 
+                    rwc.user_id as user_id,
+                    rwc.ai_id as ai_id,
+                    rwc.iq_id as iq_id,
+                    CASE WHEN rwc.contribution is NULL THEN 0 ELSE rwc.contribution END AS contribution 
                 FROM
-                    group_members as gm
-                LEFT JOIN rw_contribution as rwc
-                    ON gm.user_id = rwc.user_id
-                ORDER BY gm.user_id
-            )
+                    (
+                        SELECT 
+                            temp1.user_id, 
+                            temp1.ai_id, 
+                            temp1.iq_id, 
+                            rw.contribution 
+                        FROM    
+                            (
+                              (
+                                group_members AS gm 
+                                CROSS JOIN 
+                                    (
+                                        SELECT DISTINCT r.iq_id 
+                                        FROM rw_contribution AS r
+                                    ) AS id_list
+                              ) AS temp1  
+                            LEFT JOIN rw_contribution AS rw 
+                            ON rw.user_id = temp1.user_id AND rw.iq_id = temp1.iq_id
+                            )
+                    ) AS rwc      
+                ORDER BY rwc.user_id
+            ) 
         ),
         rw_contribution_arr AS (
             (

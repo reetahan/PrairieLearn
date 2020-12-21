@@ -41,12 +41,29 @@ router.get('/', (req, res, next) => {
                     if (ERR(err, next)) return;
                     res.locals.log = result.rows;
                     if (res.locals.assessment.group_work) {
-                        const params = [res.locals.assessment_instance.id];
-                        sqlDb.call('instance_questions_group_contribution', params, (err, result) => {
-                            if (ERR(err, next)) return;
-                            res.locals.group_info = result.rows;
+                        const group_cont_param = [res.locals.assessment_instance.id];
+                        console.log("about to make first call!");
+                        console.log(group_cont_param);
+                        sqlDb.call('instance_questions_group_contribution', group_cont_param, (err, result) => {
+                            console.log("DB call made. Error? processing now")
+                                        if (ERR(err, next)) return;
+                            res.locals.group_stats = result.rows;
+                            console.log("first instance");
+                            console.log(res.locals.group_stats);
+                            const params = {assessment_instance_id: res.locals.assessment_instance.id};
+                            sqlDb.query(sql.select_group_info, params, (err, result) => {
+                                if (ERR(err, next)) {
+                                        console.log("Error!");
+                                        console.log(ERR(err,next));     
+                                        return;
+                                    }
+                            console.log("just prior to .group add");
+                            console.log(res.locals.group_stats);
+                            res.locals.group = result.rows[0];
                             res.render(__filename.replace(/\.js$/, '.ejs'), res.locals);
+                           });
                         });
+
                     } else {
                         res.render(__filename.replace(/\.js$/, '.ejs'), res.locals);
                     }
